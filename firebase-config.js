@@ -1,19 +1,17 @@
-// Firebase 配置
+// Firebase 配置（Firestore-only）
 const firebaseConfig = {
   apiKey: "AIzaSyAIIS_PAOt0PqCZwLr1PQaH1JhH4qJYnzc",
   authDomain: "work-order-system-d1b39.firebaseapp.com",
-  databaseURL: "https://work-order-system-d1b39-default-rtdb.firebaseio.com",
   projectId: "work-order-system-d1b39",
-  storageBucket: "work-order-system-d1b39.firebasestorage.app",
-  messagingSenderId: "76896283317",
-  appId: "1:76896283317:web:7fd60ae69a115d4bafecfc",
-  measurementId: "G-N6DE2N1NGN"
+  appId: "1:76896283317:web:7fd60ae69a115d4bafecfc"
 };
 
-// 初始化 Firebase
-firebase.initializeApp(firebaseConfig);
+// 初始化 Firebase（Compat SDK 已在 HTML 中引入）
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-// 初始化 Firestore
+// 初始化 Firestore（仅使用 Firestore）
 const db = firebase.firestore();
 
 // 实时同步功能
