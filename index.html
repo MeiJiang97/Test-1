@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Orders List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics-compat.js"></script>
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'text-primary': '#161616',
+                        'text-secondary': '#525252',
+                        'text-placeholder': '#a8a8a8',
+                        'text-on-color': '#ffffff',
+                        'button-primary': '#003187',
+                        'link-button': '#3068D7',
+                        'border-subtle': '#e0e0e0',
+                        'border-subtle-01': '#c6c6c6',
+                        'border-subtle-03': '#c6c6c6',
+                        'layer-02': '#ffffff',
+                        'brand-yellow': '#FFAD00',
+                        'brand-red': '#D93C18',
+                        'brand-deep-blue': '#3A4458',
+                        'brand-blue': '#3068D7',
+                        'tag-color': '#0043ce',
+                        'support-error': '#da1e28',
+                        'support-warning': '#f1c21b',
+                        'support-success': '#24a148',
+                        'light-grey': '#E6E6E6'
+                    },
+                    fontFamily: {
+                        'ibm-plex': ['IBM Plex Sans', 'sans-serif'],
+                        'ibm-plex-mono': ['IBM Plex Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .adjustLetterSpacing { letter-spacing: 0.28px; }
+        .icon-svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .icon-svg-sm { width: 16px; height: 16px; flex-shrink: 0; }
+        .icon-svg-lg { width: 24px; height: 24px; flex-shrink: 0; }
+        
+        .table-row:hover { background-color: #f8f9ff; }
+        .table-row.selected { background-color: #e8f0ff; }
+        
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .checkbox-custom:checked {
+            background-color: #003187;
+            border-color: #003187;
+        }
+        
+        .status-tag-new {
+            background-color: #d0e2ff;
+            color: #0043ce;
+        }
+        .status-tag-status2 {
+            background-color: #e8daff;
+            color: #6929c4;
+        }
+        .status-tag-status3 {
+            background-color: #9ef0f0;
+            color: #005d5d;
+        }
+        
+        .priority-high {
+            color: #da1e28;
+        }
+        .priority-medium {
+            color: #f1c21b;
+        }
+        .priority-low {
+            color: #24a148;
+        }
+    </style>
+</head>
+<body class="font-ibm-plex bg-[#f3f6f9]">
+    <div class="flex h-screen">
+        <!-- Navigation Bar -->
+        <div class="w-[206px] bg-[#D1E1FF] relative">
+            <div class="h-full w-[206px] relative">
+                <!-- Logo -->
+                <div class="absolute left-5 top-4 w-[105px] h-[25.645px]">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded"></div>
+                        <span class="text-text-primary font-medium text-sm">Vendor</span>
+                    </div>
+                </div>
+                
+                <!-- Sidebar Toggle -->
+                <div class="absolute right-5 top-5">
+                    <svg class="icon-svg text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <div class="absolute left-5 top-20 w-[143px]">
+                    <div class="flex flex-col space-y-7">
+                        <div class="flex items-center space-x-2">
+                            <svg class="icon-svg text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            <span class="text-text-primary font-medium text-sm tracking-wide">Dashboard</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <svg class="icon-svg text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <span class="text-text-primary font-medium text-sm tracking-wide">Work Orders</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <svg class="icon-svg text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="text-text-primary font-medium text-sm tracking-wide">Invoices</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <svg class="icon-svg text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-text-primary font-medium text-sm tracking-wide">Setup</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute inset-0 border-r border-border-subtle pointer-events-none"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 bg-[#f3f6f9] flex flex-col gap-4 px-8 py-[68px] min-w-[768px]">
+            <!-- Top Header Bar -->
+            <div class="absolute top-0 right-0 w-[1641px] h-[50px] bg-white">
+                <div class="absolute right-10 top-2.5 w-[141px] h-[30px] flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button class="text-text-primary hover:text-link-button transition-colors duration-200" onclick="window.location.href='Create WO.html'">
+                            <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </button>
+                        <div class="relative">
+                            <button class="text-text-primary hover:text-link-button">
+                                <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-red rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-[30px] h-[30px] bg-brand-deep-blue rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-base">VD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="flex justify-between items-center w-full">
+                <h1 class="text-text-primary font-semibold text-xl tracking-wide">Work Orders</h1>
+            </div>
+
+            <!-- Search and Actions -->
+            <div class="flex flex-col gap-4 w-full">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex flex-row gap-3 items-center">
+                        <div class="relative">
+                            <input type="text" placeholder="Search input text" class="w-[665px] h-8 px-4 py-4 border border-border-subtle rounded text-text-placeholder text-sm font-normal tracking-wide bg-white">
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex flex-row gap-3 items-center">
+                        <button class="h-8 px-4 py-2 border border-button-primary text-button-primary rounded text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors">
+                            Action 1
+                        </button>
+                        <button class="h-8 px-4 py-2 border border-button-primary text-button-primary rounded text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors">
+                            Action 2
+                        </button>
+                        <button class="h-8 px-4 py-2 border border-button-primary text-button-primary rounded text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors">
+                            Invoice
+                        </button>
+                        <button class="h-8 w-8 border border-button-primary text-button-primary rounded hover:bg-gray-50 transition-colors flex items-center justify-center">
+                            <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a6 6 0 110 12 6 6 0 010-12z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <select class="w-[161px] h-8 px-4 py-2 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                                <option>Sort: Default</option>
+                                <option>Sort: Date</option>
+                                <option>Sort: Priority</option>
+                            </select>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <select class="w-[55px] h-8 px-4 py-2 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Badge -->
+                <div class="flex items-center gap-2">
+                    <svg class="icon-svg-sm text-link-button" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                    </svg>
+                    <span class="text-link-button text-sm font-medium tracking-wide">All Filters</span>
+                    <div class="bg-brand-blue text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">1</div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="bg-white rounded-lg overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-light-grey">
+                        <tr>
+                            <th class="px-4 py-2.5 text-left">
+                                <input type="checkbox" class="checkbox-custom">
+                            </th>
+                            <th class="px-4 py-2.5 text-left text-text-primary font-semibold text-sm tracking-wide">Work Order ID</th>
+                            <th class="px-4 py-2.5 text-left text-text-primary font-semibold text-sm tracking-wide">Description</th>
+                            <th class="px-4 py-2.5 text-left text-text-primary font-semibold text-sm tracking-wide">Status</th>
+                            <th class="px-4 py-2.5 text-left text-text-primary font-semibold text-sm tracking-wide">Priority</th>
+                            <th class="px-4 py-2.5 text-left text-text-primary font-semibold text-sm tracking-wide">Target Complete Date</th>
+                            <th class="px-4 py-2.5 text-left"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-4 py-3 border-t border-border-subtle-01">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <select class="h-12 px-2 py-3.5 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select>
+                            <span class="text-text-secondary text-sm">1 – 10 of 98 items</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <select class="h-12 px-2 py-3.5 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                            <span class="text-text-primary text-sm">of 2 pages</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="h-12 w-12 border border-border-subtle rounded hover:bg-gray-50 transition-colors flex items-center justify-center">
+                                <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button class="h-12 w-12 border border-border-subtle rounded hover:bg-gray-50 transition-colors flex items-center justify-center">
+                                <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive functionality
+                    document.addEventListener('DOMContentLoaded', function() {
+                // Load and display work orders from Firebase
+                loadWorkOrdersFromFirebase();
+            
+            // Table row selection
+            const tableRows = document.querySelectorAll('.table-row');
+            const checkboxes = document.querySelectorAll('.checkbox-custom');
+            
+            tableRows.forEach((row, index) => {
+                const checkbox = row.querySelector('.checkbox-custom');
+                
+                row.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        checkbox.checked = !checkbox.checked;
+                        updateRowSelection(row, checkbox.checked);
+                    }
+                });
+                
+                checkbox.addEventListener('change', () => {
+                    updateRowSelection(row, checkbox.checked);
+                });
+            });
+            
+            function updateRowSelection(row, selected) {
+                if (selected) {
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            }
+            
+            // Select all functionality
+            const selectAllCheckbox = document.querySelector('thead .checkbox-custom');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', () => {
+                    const isChecked = selectAllCheckbox.checked;
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                        const row = checkbox.closest('.table-row');
+                        updateRowSelection(row, isChecked);
+                    });
+                });
+            }
+            
+            // Search functionality
+            const searchInput = document.querySelector('input[placeholder="Search input text"]');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('tbody .table-row');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Action buttons
+            const actionButtons = document.querySelectorAll('button');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Button clicked:', button.textContent);
+                });
+            });
+            
+            // Function to load work orders from Firebase
+            async function loadWorkOrdersFromFirebase() {
+                try {
+                    console.log('Loading work orders from Firebase...');
+                    
+                    // Check if Firebase is initialized
+                    if (typeof firebase === 'undefined') {
+                        console.error('Firebase not loaded');
+                        // Fallback to localStorage
+                        loadWorkOrdersFromLocalStorage();
+                        return;
+                    }
+                    
+                    // Initialize Firebase if not already done
+                    if (!firebase.apps.length) {
+                        console.log('Firebase not initialized, using localStorage fallback');
+                        loadWorkOrdersFromLocalStorage();
+                        return;
+                    }
+                    
+                    const db = firebase.firestore();
+                    const snapshot = await db.collection('workOrders').orderBy('createdAt', 'desc').get();
+                    
+                    if (snapshot.empty) {
+                        console.log('No work orders found in Firebase, initializing with default data');
+                        await initializeDefaultData();
+                    } else {
+                        const workOrders = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                        console.log('Loaded work orders from Firebase:', workOrders);
+                        displayWorkOrders(workOrders);
+                    }
+                } catch (error) {
+                    console.error('Error loading from Firebase:', error);
+                    // Fallback to localStorage
+                    loadWorkOrdersFromLocalStorage();
+                }
+            }
+            
+            // Fallback function using localStorage
+            function loadWorkOrdersFromLocalStorage() {
+                const savedWorkOrders = JSON.parse(localStorage.getItem('workOrders') || '[]');
+                
+                console.log('Loading work orders from localStorage:', savedWorkOrders);
+                
+                if (savedWorkOrders.length === 0) {
+                    const defaultWorkOrders = [
+                        {
+                            workOrderId: '#1001',
+                            description: 'Window Damage – Glass Repair Needed',
+                            status: 'New',
+                            priority: 'High',
+                            targetDate: '2025-11-23'
+                        },
+                        {
+                            workOrderId: '#1002',
+                            description: 'HVAC System Maintenance',
+                            status: 'New',
+                            priority: 'Medium',
+                            targetDate: '2025-11-21'
+                        },
+                        {
+                            workOrderId: '#1003',
+                            description: 'Electrical Panel Inspection',
+                            status: 'Status 2',
+                            priority: 'Medium',
+                            targetDate: '2025-11-20'
+                        },
+                        {
+                            workOrderId: '#1004',
+                            description: 'Plumbing Repair - Floor 3',
+                            status: 'Status 2',
+                            priority: 'Medium',
+                            targetDate: '2025-11-19'
+                        },
+                        {
+                            workOrderId: '#1005',
+                            description: 'Fire Alarm System Test',
+                            status: 'Status 2',
+                            priority: 'Medium',
+                            targetDate: '2025-11-19'
+                        },
+                        {
+                            workOrderId: '#1006',
+                            description: 'Security Camera Installation',
+                            status: 'Status 2',
+                            priority: 'High',
+                            targetDate: '2025-11-17'
+                        },
+                        {
+                            workOrderId: '#1007',
+                            description: 'Elevator Maintenance',
+                            status: 'Status 3',
+                            priority: 'Low',
+                            targetDate: '2025-11-14'
+                        },
+                        {
+                            workOrderId: '#1008',
+                            description: 'Roof Inspection and Repair',
+                            status: 'Status 3',
+                            priority: 'Low',
+                            targetDate: '2025-11-10'
+                        }
+                    ];
+                    
+                    localStorage.setItem('workOrders', JSON.stringify(defaultWorkOrders));
+                    displayWorkOrders(defaultWorkOrders);
+                } else {
+                    displayWorkOrders(savedWorkOrders);
+                }
+            }
+            
+            // Initialize default data in Firebase
+            async function initializeDefaultData() {
+                const defaultWorkOrders = [
+                    {
+                        workOrderId: '#1001',
+                        description: 'Window Damage – Glass Repair Needed',
+                        status: 'New',
+                        priority: 'High',
+                        targetDate: '2025-11-23',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1002',
+                        description: 'HVAC System Maintenance',
+                        status: 'New',
+                        priority: 'Medium',
+                        targetDate: '2025-11-21',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1003',
+                        description: 'Electrical Panel Inspection',
+                        status: 'Status 2',
+                        priority: 'Medium',
+                        targetDate: '2025-11-20',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1004',
+                        description: 'Plumbing Repair - Floor 3',
+                        status: 'Status 2',
+                        priority: 'Medium',
+                        targetDate: '2025-11-19',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1005',
+                        description: 'Fire Alarm System Test',
+                        status: 'Status 2',
+                        priority: 'Medium',
+                        targetDate: '2025-11-19',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1006',
+                        description: 'Security Camera Installation',
+                        status: 'Status 2',
+                        priority: 'High',
+                        targetDate: '2025-11-17',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1007',
+                        description: 'Elevator Maintenance',
+                        status: 'Status 3',
+                        priority: 'Low',
+                        targetDate: '2025-11-14',
+                        createdAt: new Date()
+                    },
+                    {
+                        workOrderId: '#1008',
+                        description: 'Roof Inspection and Repair',
+                        status: 'Status 3',
+                        priority: 'Low',
+                        targetDate: '2025-11-10',
+                        createdAt: new Date()
+                    }
+                ];
+                
+                try {
+                    const db = firebase.firestore();
+                    const batch = db.batch();
+                    
+                    defaultWorkOrders.forEach(workOrder => {
+                        const docRef = db.collection('workOrders').doc();
+                        batch.set(docRef, workOrder);
+                    });
+                    
+                    await batch.commit();
+                    console.log('Default data initialized in Firebase');
+                    displayWorkOrders(defaultWorkOrders);
+                } catch (error) {
+                    console.error('Error initializing default data:', error);
+                    displayWorkOrders(defaultWorkOrders);
+                }
+            }
+            
+            // Function to display work orders
+            function displayWorkOrders(workOrders) {
+                const tbody = document.querySelector('tbody');
+                
+                // Clear all existing rows (tbody is now empty, so this is just for safety)
+                tbody.innerHTML = '';
+                
+                // Add work orders to the table
+                workOrders.forEach((workOrder, index) => {
+                    const newRow = createWorkOrderRow(workOrder, index + 1);
+                    tbody.appendChild(newRow);
+                });
+                
+                console.log('Displayed work orders:', workOrders.length);
+                
+                // Update pagination info
+                updatePaginationInfo(workOrders.length);
+            }
+            
+            // Function to create a work order row
+            function createWorkOrderRow(workOrder, index) {
+                const row = document.createElement('tr');
+                row.className = 'table-row border-b border-border-subtle-01';
+                
+                // Use the work order ID from the data
+                const workOrderId = workOrder.workOrderId || `#${1000 + index}`;
+                
+                console.log('Creating row for work order:', workOrderId, workOrder);
+                
+                // Format date
+                const targetDate = workOrder.targetDate ? new Date(workOrder.targetDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                }) : 'Nov 23, 2025';
+                
+                // Get status tag class
+                const statusClass = workOrder.status === 'New' ? 'status-tag-new' : 
+                                  workOrder.status === 'Status 2' ? 'status-tag-status2' : 'status-tag-status3';
+                
+                // Get priority class
+                const priorityClass = workOrder.priority === 'High' ? 'priority-high' : 
+                                   workOrder.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+                
+                row.innerHTML = `
+                    <td class="px-4 py-4">
+                        <input type="checkbox" class="checkbox-custom">
+                    </td>
+                    <td class="px-4 py-4 text-text-secondary text-sm">${workOrderId}</td>
+                    <td class="px-4 py-4">
+                        <div class="font-semibold text-text-primary text-sm">${workOrder.description || 'Content'}</div>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="${statusClass} px-2 py-0.5 rounded-full text-xs">${workOrder.status || 'New'}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="${priorityClass} text-sm font-medium">${workOrder.priority || 'High'}</span>
+                    </td>
+                    <td class="px-4 py-4 text-text-secondary text-sm">${targetDate}</td>
+                    <td class="px-4 py-4">
+                        <button class="text-text-secondary hover:text-text-primary">
+                            <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a6 6 0 110 12 6 6 0 010-12z"></path>
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                
+                // Add event listeners to the new row
+                const checkbox = row.querySelector('.checkbox-custom');
+                checkbox.addEventListener('change', () => {
+                    updateRowSelection(row, checkbox.checked);
+                });
+                
+                row.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        checkbox.checked = !checkbox.checked;
+                        updateRowSelection(row, checkbox.checked);
+                    }
+                });
+                
+                return row;
+            }
+            
+            // Function to update pagination info
+            function updatePaginationInfo(totalItems) {
+                // Find the pagination text element more specifically
+                const paginationContainer = document.querySelector('.flex.items-center.gap-4 .flex.items-center.gap-2 .text-text-secondary.text-sm');
+                if (paginationContainer) {
+                    paginationContainer.textContent = `1 – ${Math.min(10, totalItems)} of ${totalItems} items`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

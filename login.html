@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Delta</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- IBM Plex Sans font -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'IBM Plex Sans', sans-serif; }
+    .font-ibm { font-family: 'IBM Plex Sans', sans-serif; }
+    .text-title-lg { font-size: 22px; line-height: 28px; font-weight: 600; }
+    .text-body-md { font-size: 14px; line-height: 20px; font-weight: 400; }
+    .text-label-lg { font-size: 16px; line-height: 24px; font-weight: 500; }
+    .text-label-sm { font-size: 12px; line-height: 16px; font-weight: 500; }
+    .shadow-custom { box-shadow: 0px 1.85px 6.25px 0px rgba(0,0,0,0.25); }
+  </style>
+</head>
+<body class="bg-[#f7f7f7] flex flex-col items-center min-h-screen font-ibm">
+  <div class="bg-[#ffffff] w-full max-w-xl mt-12 rounded shadow-custom overflow-hidden">
+    <!-- Logo -->
+    <div class="flex justify-center py-8">
+      <div class="h-11 w-[182px] bg-center bg-cover" style="background-image: url('http://localhost:3845/assets/8a056171b301c0c4848b3a00ec4b9fe390d9f0d8.png');"></div>
+    </div>
+    <!-- Card -->
+    <div class="bg-[#ffffff] relative px-12 py-8">
+      <!-- Title -->
+      <h1 class="text-title-lg text-[#161616] mb-8">Log in</h1>
+      <!-- Input -->
+      <div class="mb-6 w-full">
+        <label class="block text-label-sm text-neutral-600 mb-2">Username or Email</label>
+        <input
+          type="text"
+          placeholder="Please enter here"
+          class="w-full h-12 px-4 border-2 border-[#0f62fe] rounded text-body-md text-[#a8a8a8] focus:outline-none"
+        />
+      </div>
+      <!-- Button -->
+      <button class="w-full h-12 bg-[#003187] rounded text-label-lg text-[#ffffff] font-medium mb-6">Next</button>
+      <!-- Face ID and Remember Me -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center">
+          <img src="http://localhost:3845/assets/5b741e2619694e7700b08753b228575569e2b625.svg" class="h-6 w-6 mr-2" alt="Face ID" />
+          <span class="text-label-sm text-[#3068d7] font-medium">Face ID</span>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" class="mr-2" />
+          <span class="text-label-sm text-neutral-600 font-medium">Remember me</span>
+        </div>
+      </div>
+      <!-- Social Login -->
+      <div class="flex items-center my-6">
+        <div class="flex-1 h-px bg-gray-200"></div>
+        <span class="mx-4 text-body-md text-[#525252]">or log with</span>
+        <div class="flex-1 h-px bg-gray-200"></div>
+      </div>
+      <div class="flex justify-center gap-8 mb-6">
+        <img src="http://localhost:3845/assets/8f3edc46b55317cc4c489b4b749859b75364c034.svg" class="h-8 w-8" alt="Google" />
+        <img src="http://localhost:3845/assets/d04a2b5289b6290a8cf53253aa3bfd9184a4a0b9.svg" class="h-8 w-8" alt="Apple" />
+        <img src="http://localhost:3845/assets/67c1bfda2830297707b0d98422b96673e4a6badf.svg" class="h-8 w-8" alt="Microsoft" />
+      </div>
+      <!-- Register -->
+      <div class="text-center text-label-sm text-[#161616]">
+        New to Delta? <a href="#" class="text-[#3068d7] font-medium">Register here</a>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="flex justify-center gap-8 text-body-md text-neutral-600 py-4">
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy</a>
+      <a href="#">Help</a>
+    </div>
+    <div class="text-center text-[#B3B3B3] text-body-md pb-4">
+      © 2024 Delta Software Solutions Ltd. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
