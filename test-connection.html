@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -131,3 +132,134 @@
 </body>
 </html>
 
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Firestore 测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 200px; }
+    </style>
+    <!-- 使用模块化最新 SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+        // 🔑 直接在这里填你的 Firestore 配置
+        const firebaseConfig = {
+            
+
+            apiKey: "AIzaSyAIIS_PAOt0PqCZwLr1PQaH1JhH4qJYnzc",
+            authDomain: "work-order-system-d1b39.firebaseapp.com",
+            projectId: "work-order-system-d1b39",
+            appId: "1:76896283317:web:7fd60ae69a115d4bafecfc"
+        };
+
+        // 初始化 Firebase 和 Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 页面元素
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'status';
+        statusDiv.textContent = '正在测试连接...';
+        document.body.prepend(statusDiv);
+
+        const dataDisplay = document.createElement('div');
+        dataDisplay.style = "margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;";
+        dataDisplay.innerHTML = '<p>数据将在这里显示...</p>';
+        document.body.appendChild(dataDisplay);
+
+        const input = document.createElement('input');
+        input.id = 'testInput';
+        input.placeholder = '输入测试数据';
+        document.body.appendChild(input);
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '添加数据';
+        document.body.appendChild(addBtn);
+
+        const getBtn = document.createElement('button');
+        getBtn.textContent = '获取数据';
+        document.body.appendChild(getBtn);
+
+        const clearBtn = document.createElement('button');
+        clearBtn.textContent = '清除数据';
+        document.body.appendChild(clearBtn);
+
+        // 🔹 测试连接
+        async function testConnection() {
+            try {
+                const docRef = await addDoc(collection(db, 'test'), { message: '连接测试', timestamp: new Date().toISOString() });
+                statusDiv.textContent = '✅ 连接成功！Firebase 已配置完成。';
+                statusDiv.className = 'status success';
+                await deleteDoc(doc(db, 'test', docRef.id)); // 清理测试数据
+            } catch (error) {
+                statusDiv.textContent = '❌ 连接失败: ' + error.message;
+                statusDiv.className = 'status error';
+                console.error('连接错误:', error);
+            }
+        }
+
+        // 🔹 添加数据
+        addBtn.onclick = async () => {
+            const value = input.value.trim();
+            if (!value) return;
+            try {
+                await addDoc(collection(db, 'test'), { message: value, timestamp: new Date().toISOString() });
+                input.value = '';
+                alert('数据添加成功！');
+                getData();
+            } catch (error) {
+                alert('添加失败: ' + error.message);
+            }
+        };
+
+        // 🔹 获取数据
+        getBtn.onclick = async () => {
+            try {
+                const snapshot = await getDocs(collection(db, 'test'));
+                if (snapshot.empty) {
+                    dataDisplay.innerHTML = '<p>暂无数据</p>';
+                    return;
+                }
+                let html = '<h4>当前数据:</h4>';
+                snapshot.forEach(doc => {
+                    html += `<div style="border-bottom:1px solid #ddd;padding:5px 0;"><strong>${doc.data().message}</strong><br><small>ID: ${doc.id}</small></div>`;
+                });
+                dataDisplay.innerHTML = html;
+            } catch (error) {
+                alert('获取数据失败: ' + error.message);
+            }
+        };
+
+        // 🔹 清除数据
+        clearBtn.onclick = async () => {
+            try {
+                const snapshot = await getDocs(collection(db, 'test'));
+                const batch = writeBatch(db);
+                snapshot.forEach(docItem => batch.delete(doc(db, 'test', docItem.id)));
+                await batch.commit();
+                alert(`已清除 ${snapshot.size} 条数据`);
+                getBtn.click();
+            } catch (error) {
+                alert('清除失败: ' + error.message);
+            }
+        };
+
+        // 页面加载时测试连接
+        window.addEventListener('DOMContentLoaded', testConnection);
+    </script>
+</head>
+<body>
+</body>
+</html>
