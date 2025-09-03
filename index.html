@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Orders List</title>
+    <script>
+        // Redirect to the canonical Work Orders page
+        window.location.replace('WO list.html');
+    </script>
+    <noscript>
+        <meta http-equiv="refresh" content="0; url=WO list.html">
+    </noscript>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
@@ -160,11 +167,8 @@
                             </svg>
                         </button>
                         <div class="relative">
-                            <button class="text-text-primary hover:text-link-button">
-                                <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2z"></path>
-                                </svg>
+                            <button class="text-text-primary hover:text-link-button" aria-label="Notifications">
+                                <img src="icons/line-md_bell-loop.svg" width="24" height="24" alt="Notifications" />
                             </button>
                             <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-red rounded-full"></div>
                         </div>

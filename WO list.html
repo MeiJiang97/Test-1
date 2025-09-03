@@ -146,24 +146,17 @@
         <div class="flex-1 bg-[#f3f6f9] flex flex-col gap-4 px-8 py-[68px] min-w-[768px]">
             <!-- Top Header Bar -->
             <div class="absolute top-0 right-0 w-[1641px] h-[50px] bg-white">
-                <div class="absolute right-10 top-2.5 w-[141px] h-[30px] flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <button class="text-text-primary hover:text-link-button transition-colors duration-200" onclick="window.location.href='Create WO.html'">
-                            <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
+                <div class="absolute right-10 top-2.5 h-[30px] flex items-center">
+                    <div class="flex items-center space-x-8">
+                        <button class="text-text-primary hover:text-link-button transition-colors duration-200" onclick="window.location.href='Create WO.html'" aria-label="Add">
+                            <img src="icons/add-outline.svg" width="24" height="24" alt="Add" />
                         </button>
                         <div class="relative">
-                            <button class="text-text-primary hover:text-link-button">
-                                <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2z"></path>
-                                </svg>
+                            <button class="text-text-primary hover:text-link-button" aria-label="Notifications">
+                                <img src="icons/line-md_bell-loop.svg" width="24" height="24" alt="Notifications" />
                             </button>
                             <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-red rounded-full"></div>
                         </div>
-                    </div>
-                    <div class="flex items-center space-x-2.5">
                         <div class="w-[30px] h-[30px] bg-brand-deep-blue rounded-full flex items-center justify-center">
                             <span class="text-white font-bold text-base">VD</span>
                         </div>
@@ -181,7 +174,7 @@
                 <div class="flex items-center justify-between w-full">
                     <div class="flex flex-row gap-3 items-center">
                         <div class="relative">
-                            <input type="text" placeholder="Search input text" class="w-[665px] h-8 px-4 py-4 border border-border-subtle rounded text-text-placeholder text-sm font-normal tracking-wide bg-white">
+                            <input type="text" placeholder="Search input text" class="w-[665px] h-8 pl-10 pr-4 py-4 border border-border-subtle rounded text-text-placeholder text-sm font-normal tracking-wide bg-white">
                             <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
                                 <svg class="icon-svg-sm text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -210,7 +203,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="relative">
-                            <select class="w-[161px] h-8 px-4 py-2 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                            <select class="w-[161px] h-8 px-4 py-1 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white leading-[1.1rem]">
                                 <option>Sort: Default</option>
                                 <option>Sort: Date</option>
                                 <option>Sort: Priority</option>
@@ -222,7 +215,7 @@
                             </div>
                         </div>
                         <div class="relative">
-                            <select class="w-[55px] h-8 px-4 py-2 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white">
+                            <select class="w-[55px] h-8 px-4 py-1 border border-border-subtle rounded text-text-primary text-sm font-normal tracking-wide appearance-none bg-white leading-[1.1rem]">
                                 <option>10</option>
                                 <option>20</option>
                                 <option>50</option>
